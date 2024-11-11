@@ -1,1 +1,336 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Your Library</title>
+    <style>
+        body {
+            background-color: rgb(45, 37, 37);
+           
+            font-family:monospace
+        }
 
+        button {
+            background-color: rgb(0, 0, 0);
+            color: yellow;
+            padding: 1em;
+            border-radius: .2em;
+            margin-top: 1em;
+        }
+
+        /* button:hover {
+            background-color: rgb(45, 37, 37);
+            color: #e0e0e0
+        } */
+
+        text {
+            margin: 1em;
+        }
+
+        h1 {
+            margin-top: 2em;
+            color: yellow;
+        }
+
+       .logo {
+            color: yellow;
+            text-shadow:   -5px -5px 0 rgb(0, 0, 0),   /* Outline top-left */
+           5px -5px 0 rgb(0, 0, 0),    /* Outline top-right */
+            -5px 5px 0 rgb(0, 0, 0),    /* Outline bottom-left */
+           5px 5px 0 rgb(0, 0, 0);
+             }
+        /* .card-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 4em;
+            background-color: rgb(0, 0, 0);
+            margin-top: 1em;
+        } */
+        .card {
+            width: 300px;
+            padding: 24px;
+            padding-top: 1em;
+            padding-bottom: 40px;
+            background-color: yellow;
+            color: rgb(0, 0, 0);
+            border: 1px solid #6b6b6b;
+            border-radius: 8px;
+            text-align: center;
+            cursor: pointer;
+            transition: background-color 0.3s;
+            display: flex;
+            flex-direction: column;
+        }
+        .card:hover {
+            background-color: #e0e0e0;
+            color: rgb(45, 37, 37);
+        }
+
+        .card:hover .card-remove {
+            background-color: rgb(45, 37, 37);
+            color: #e0e0e0
+        }
+
+        div {
+            box-sizing: border-box;
+           
+            margin-top: 3em;
+            gap: 1em;
+            border-radius: 4em;
+            display: flex;
+            flex-wrap: wrap;
+            
+            text-align: center;
+        }
+        
+        dialog {
+            background-color: yellow;
+            color: black;
+        }
+        dialog::backdrop {
+          background-color: hsla(0, 0%, 8%, 0.652);
+         }
+    </style>
+</head>
+<body>
+    <h1><span class="logo"><strong>indeX.mania</strong></span></h1>
+
+    <button class="display-library">your [ <strong>COLLECTION</strong> ]</button>
+    <button class="add-book">+add [ <strong>BOOK</strong> ]</button>
+    <dialog>
+        <form method="dialog" id="new-book-form">
+            <label for="book-title">Book Title</label>
+            <input type="text" id="book-title" required>
+            <label for="book-author">Book Author</label>
+            <input type="text" id="book-author" required>
+            <label for="book-pages">Pages</label>
+            <input type="text" id="book-pages" required>
+            <label for="read-status">Read Status</label>
+            <input type="checkbox" id="read-status" />
+           
+                <button type="submit" class="submit-book">+add [ BOOK ]</button>
+            <button type="submit">x[ CANCEL ]</button>
+        </form>
+    </dialog>
+    <div class="output">
+    <div class="card-container">
+
+
+    </div>
+    </div>
+</body>
+
+    <script>
+        const myLibrary = [];
+
+        // constructor obj
+          function toLibrary(title, author, pages, status) {
+            this.title = title;
+            this.pages = pages;
+            this.author = author;
+            this.status = status;
+          }
+
+          toLibrary.prototype.log = function () {
+            return (`Book Name: ${this.title}   Author Name: ${this.author}   Total Pages: ${this.pages}   Status: ${this.status}`)
+        }
+       
+       
+        //  add books function
+
+          function Book(title, author, pages, status) {
+            toLibrary.call(this, title, author, pages, status),
+          
+            myLibrary.push(this)
+            
+            }
+        
+
+        Book.prototype = Object.create(toLibrary.prototype);
+        Book.prototype.constructor = Book;
+      
+
+          const book1 = new Book('The Hobbit', "J.R.R Tolkien", 296, 'Read')
+          const book2 = new Book('The Chronicles of Narnia', "C.S Lewis", 455, 'Read')
+          const book3 = new Book('Harry Potter', "J.K Rowling", 912, 'Not Read')
+          const book4 = new Book('Fire and Blood', "George R.R Martin", 640, 'Not Read')
+     
+          
+          book1.log();
+          console.log(book2.log())
+          console.log(book3.log());
+          console.log(book4.log());
+          
+          
+          console.log(myLibrary)
+
+          
+    
+
+
+
+
+          const actionBtn = document.querySelector('.display-library');
+          actionBtn.addEventListener('click', () => {
+
+          const cardDisplay = document.querySelector('.card-container');
+          cardDisplay.innerHTML = '';
+
+          myLibrary.forEach(function (book, index) {
+          const card = document.createElement('div');
+          card.classList.add('card');
+          card.setAttribute('data-index', index)
+          card.innerHTML =  `<p>Book</p><h3>${book.title}</h3><p><strong>Author: </strong>${book.author}</p><p><strong>Total Pages: </strong>${book.pages}</p><p><strong>Status: </strong><span class="status">${book.status}</span><input type="checkbox" class="read-status" $${book.status === "Read" ? 'checked' : ''} /></p>`
+          
+          const removeBtn = document.createElement('button');
+          removeBtn.classList.add('card-remove');
+          removeBtn.textContent = '-remove.Book[from.COLLECTION]'
+          removeBtn.addEventListener('click', () => removeBook(index))
+          
+          const toggleStatus = card.querySelector('.read-status');
+          toggleStatus.addEventListener('click', (event) => changeStatus(event, index))
+
+         
+          card.appendChild(removeBtn)
+          cardDisplay.appendChild(card)
+          document.body.appendChild(cardDisplay)
+          console.log(book);
+          
+          })
+          }) 
+
+          function changeStatus(event, index) {
+            const checkbox = event.target
+            const book = myLibrary[index]
+            if (checkbox.checked) {
+                book.status = "Read";
+            } else {book.status = "Not Read"
+            }
+           const statusElement = event.target.closest('.card').querySelector('.status');
+           statusElement.textContent = book.status
+        }
+
+        //             function updateLibrary() {
+        //     const cardDisplay = document.querySelector('.card-container');
+        //   cardDisplay.innerHTML = '';
+
+        //   myLibrary.forEach(function (book, index) {
+        //   const card = document.createElement('div');
+        //   card.classList.add('card');
+        //   card.setAttribute('data-index', index)
+        //   card.innerHTML =  `<p>Book</p><h3>${book.title}</h3><p><strong>Author: </strong>${book.author}</p><p><strong>Total Pages: </strong>${book.pages}</p><p><strong>Status: </strong><span class="status">${book.status}</span><input type="checkbox" class="read-status" $${book.status === "Read" ? 'checked' : ''} /></p>`
+          
+        //   const removeBtn = document.createElement('button');
+        //   removeBtn.classList.add('card-remove');
+        //   removeBtn.textContent = '-remove.Book[from.COLLECTION]'
+        //   removeBtn.addEventListener('click', () => removeBook(index))
+          
+        //   const toggleStatus = card.querySelector('.read-status');
+        //   toggleStatus.addEventListener('click', (event) => changeStatus(event, index))
+
+         
+        //   card.appendChild(removeBtn)
+        //   cardDisplay.appendChild(card)
+        //   document.body.appendChild(cardDisplay)
+        //   console.log(book);
+          
+        //   })
+        //   }
+    
+          const addBook = document.querySelector('.add-book');
+
+          addBook.addEventListener('click', () => {
+            const dialog = document.querySelector('dialog')
+            dialog.showModal();
+            const form = document.querySelector('#new-book-form');
+            form.addEventListener('submit', function(event) {
+                event.preventDefault();
+
+                const bookTitle = document.querySelector('#book-title').value;
+                const bookAuthor = document.querySelector('#book-author').value;
+                const bookPages = document.querySelector('#book-pages').value;
+                const bookStatus = document.querySelector('#read-status').checked ? 'Read' : 'Not Read';
+
+                const newBook = new Book(bookTitle, bookAuthor, bookPages, bookStatus)
+                updateLibrary()
+                dialog.close()
+           
+            })
+
+            dialog.addEventListener("click", e => {
+            const dialogDimensions = dialog.getBoundingClientRect()
+               if (
+               e.clientX < dialogDimensions.left ||
+               e.clientX > dialogDimensions.right ||
+               e.clientY < dialogDimensions.top ||
+               e.clientY > dialogDimensions.bottom
+                 ) {
+                 dialog.close()
+                 }
+               })
+         
+          })
+     
+
+          function removeBook(index) {
+            myLibrary.splice(index, 1)
+            const cardDisplay = document.querySelector('.card-container');
+          cardDisplay.innerHTML = '';
+
+          myLibrary.forEach(function (book, index) {
+          const card = document.createElement('div');
+          card.classList.add('card');
+          card.setAttribute('data-index', index)
+          card.innerHTML =  `<p>Book</p><h3>${book.title}</h3><p><strong>Author: </strong>${book.author}</p><p><strong>Total Pages: </strong>${book.pages}</p><p><strong>Status: </strong><span class="status">${book.status}</span><input type="checkbox" class="read-status" ${book.status === "Read" ? 'checked' : ''}</p>`
+          
+          const removeBtn = document.createElement('button');
+          removeBtn.classList.add('card-remove');
+          removeBtn.textContent = '-remove.Book[from.COLLECTION]'
+          removeBtn.addEventListener('click', () => removeBook(index))
+
+
+          card.appendChild(removeBtn)
+          cardDisplay.appendChild(card)
+      
+          console.log(book);
+          
+          })
+          }
+
+          function updateLibrary() {
+            const cardDisplay = document.querySelector('.card-container');
+          cardDisplay.innerHTML = '';
+
+          myLibrary.forEach(function (book, index) {
+          const card = document.createElement('div');
+          card.classList.add('card');
+          card.setAttribute('data-index', index)
+          card.innerHTML =  `<p>Book</p><h3>${book.title}</h3><p><strong>Author: </strong>${book.author}</p><p><strong>Total Pages: </strong>${book.pages}</p><p><strong>Status: </strong><span class="status">${book.status}</span><input type="checkbox" class="read-status" $${book.status === "Read" ? 'checked' : ''} /></p>`
+          
+          const removeBtn = document.createElement('button');
+          removeBtn.classList.add('card-remove');
+          removeBtn.textContent = '-remove.Book[from.COLLECTION]'
+          removeBtn.addEventListener('click', () => removeBook(index))
+          
+          const toggleStatus = card.querySelector('.read-status');
+          toggleStatus.addEventListener('click', (event) => changeStatus(event, index))
+
+         
+          card.appendChild(removeBtn)
+          cardDisplay.appendChild(card)
+          document.body.appendChild(cardDisplay)
+          console.log(book);
+          
+          })
+          }
+    
+
+
+
+// NEXT STEPS - USE DOM TO CREATE CARD STRUCTURES FOR YOUR BOOKS
+// OR I CAN CREATE THE DIVS IN HTML AND HAVE THEM SHOW UP ON AN EVENT LISTENER
+// BUT IDK IF THATS DOABLE, DOING IT ALL WITH DOM SOUNDS PROMISING
+    </script>
+
+</html>
