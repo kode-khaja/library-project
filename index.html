@@ -110,7 +110,7 @@
             <input type="checkbox" id="read-status" />
            
                 <button type="submit" class="submit-book">+add [ BOOK ]</button>
-            <button type="submit">x[ CANCEL ]</button>
+            <button type="button" id="cancel">x[ CANCEL ]</button>
         </form>
     </dialog>
     <div class="output">
@@ -122,34 +122,35 @@
 </body>
 
     <script>
-        const myLibrary = [];
+        let myLibrary = [];
 
-        // constructor obj
-          function toLibrary(title, author, pages, status) {
-            this.title = title;
-            this.pages = pages;
-            this.author = author;
-            this.status = status;
-          }
-
-          toLibrary.prototype.log = function () {
-            return (`Book Name: ${this.title}   Author Name: ${this.author}   Total Pages: ${this.pages}   Status: ${this.status}`)
-        }
        
+        class Book {
+        
+         constructor (title, author, pages, status) {
+                         this.title = title;
+                         this.pages = pages;
+                         this.author = author;
+                         this.status = status;
+                        //  this.log = this.log.bind(this)
+                        //  this.addBooks = this.addBooks.bind(this)
+                         }
+             
+         log () {
+            return (`Book Name: ${this.title}   Author Name: ${this.author}   Total Pages: ${this.pages}   
+            Status: ${this.status}`)
+                         }
+ 
+         
+         addBooks () {
+             myLibrary.push(this)
+         }
+        
+    }
        
         //  add books function
 
-          function Book(title, author, pages, status) {
-            toLibrary.call(this, title, author, pages, status),
-          
-            myLibrary.push(this)
-            
-            }
-        
-
-        Book.prototype = Object.create(toLibrary.prototype);
-        Book.prototype.constructor = Book;
-      
+    
 
           const book1 = new Book('The Hobbit', "J.R.R Tolkien", 296, 'Read')
           const book2 = new Book('The Chronicles of Narnia', "C.S Lewis", 455, 'Read')
@@ -158,12 +159,14 @@
      
           
           book1.log();
-          console.log(book2.log())
-          console.log(book3.log());
-          console.log(book4.log());
-          
-          
-          console.log(myLibrary)
+          book1.addBooks();
+          book2.log();
+          book2.addBooks();
+          book3.log();
+          book3.addBooks();
+          book4.log();
+          book4.addBooks();
+
 
           
     
@@ -181,7 +184,7 @@
           const card = document.createElement('div');
           card.classList.add('card');
           card.setAttribute('data-index', index)
-          card.innerHTML =  `<p>Book</p><h3>${book.title}</h3><p><strong>Author: </strong>${book.author}</p><p><strong>Total Pages: </strong>${book.pages}</p><p><strong>Status: </strong><span class="status">${book.status}</span><input type="checkbox" class="read-status" $${book.status === "Read" ? 'checked' : ''} /></p>`
+          card.innerHTML =  `<p>Book</p><h3>${book.title}</h3><p><strong>Author: </strong>${book.author}</p><p><strong>Total Pages: </strong>${book.pages}</p><p><strong>Status: </strong><span class="status">${book.status}</span><input type="checkbox" class="read-status" ${book.status === "Read" ? 'checked' : ''} /></p>`
           
           const removeBtn = document.createElement('button');
           removeBtn.classList.add('card-remove');
@@ -211,52 +214,41 @@
            statusElement.textContent = book.status
         }
 
-        //             function updateLibrary() {
-        //     const cardDisplay = document.querySelector('.card-container');
-        //   cardDisplay.innerHTML = '';
-
-        //   myLibrary.forEach(function (book, index) {
-        //   const card = document.createElement('div');
-        //   card.classList.add('card');
-        //   card.setAttribute('data-index', index)
-        //   card.innerHTML =  `<p>Book</p><h3>${book.title}</h3><p><strong>Author: </strong>${book.author}</p><p><strong>Total Pages: </strong>${book.pages}</p><p><strong>Status: </strong><span class="status">${book.status}</span><input type="checkbox" class="read-status" $${book.status === "Read" ? 'checked' : ''} /></p>`
-          
-        //   const removeBtn = document.createElement('button');
-        //   removeBtn.classList.add('card-remove');
-        //   removeBtn.textContent = '-remove.Book[from.COLLECTION]'
-        //   removeBtn.addEventListener('click', () => removeBook(index))
-          
-        //   const toggleStatus = card.querySelector('.read-status');
-        //   toggleStatus.addEventListener('click', (event) => changeStatus(event, index))
-
-         
-        //   card.appendChild(removeBtn)
-        //   cardDisplay.appendChild(card)
-        //   document.body.appendChild(cardDisplay)
-        //   console.log(book);
-          
-        //   })
-        //   }
     
           const addBook = document.querySelector('.add-book');
+          const cancelButton = document.querySelector('#cancel');
+          const form = document.querySelector('#new-book-form');
+          const dialog = document.querySelector('dialog')
 
-          addBook.addEventListener('click', () => {
-            const dialog = document.querySelector('dialog')
-            dialog.showModal();
-            const form = document.querySelector('#new-book-form');
-            form.addEventListener('submit', function(event) {
-                event.preventDefault();
-
-                const bookTitle = document.querySelector('#book-title').value;
-                const bookAuthor = document.querySelector('#book-author').value;
-                const bookPages = document.querySelector('#book-pages').value;
-                const bookStatus = document.querySelector('#read-status').checked ? 'Read' : 'Not Read';
-
-                const newBook = new Book(bookTitle, bookAuthor, bookPages, bookStatus)
-                updateLibrary()
-                dialog.close()
-           
+          form.addEventListener('submit', function(event) {
+              event.preventDefault();
+              
+              const bookTitle = document.querySelector('#book-title').value;
+              const bookAuthor = document.querySelector('#book-author').value;
+              const bookPages = document.querySelector('#book-pages').value;
+              const bookStatus = document.querySelector('#read-status').checked ? 'Read' : 'Not Read';
+              
+              const newBook = new Book(bookTitle, bookAuthor, bookPages, bookStatus)
+              newBook.addBooks()
+              updateLibrary()
+              dialog.close()
+              console.log(myLibrary)
+              
             })
+            
+            
+            addBook.addEventListener('click', () => {
+              dialog.showModal();
+          })
+  
+            cancelButton.addEventListener('click', () => {
+                console.log('cancel button clicked!!');
+                
+              event.preventDefault()
+              dialog.close()
+            })
+  
+            
 
             dialog.addEventListener("click", e => {
             const dialogDimensions = dialog.getBoundingClientRect()
@@ -269,8 +261,8 @@
                  dialog.close()
                  }
                })
-         
-          })
+            //    updateLibrary()
+    
      
 
           function removeBook(index) {
@@ -299,15 +291,17 @@
           }
 
           function updateLibrary() {
-            const cardDisplay = document.querySelector('.card-container');
+            console.log('Updating liberry...');
+            
+          const cardDisplay = document.querySelector('.card-container');
           cardDisplay.innerHTML = '';
 
           myLibrary.forEach(function (book, index) {
           const card = document.createElement('div');
           card.classList.add('card');
           card.setAttribute('data-index', index)
-          card.innerHTML =  `<p>Book</p><h3>${book.title}</h3><p><strong>Author: </strong>${book.author}</p><p><strong>Total Pages: </strong>${book.pages}</p><p><strong>Status: </strong><span class="status">${book.status}</span><input type="checkbox" class="read-status" $${book.status === "Read" ? 'checked' : ''} /></p>`
-          
+          card.innerHTML =  `<p>Book</p><h3>${book.title}</h3><p><strong>Author: </strong>${book.author}</p><p><strong>Total Pages: </strong>${book.pages}</p><p><strong>Status: </strong><span class="status">${book.status}</span><input type="checkbox" class="read-status" ${book.status === "Read" ? 'checked' : ''} /></p>`
+        
           const removeBtn = document.createElement('button');
           removeBtn.classList.add('card-remove');
           removeBtn.textContent = '-remove.Book[from.COLLECTION]'
@@ -325,12 +319,6 @@
           })
           }
     
-
-
-
-// NEXT STEPS - USE DOM TO CREATE CARD STRUCTURES FOR YOUR BOOKS
-// OR I CAN CREATE THE DIVS IN HTML AND HAVE THEM SHOW UP ON AN EVENT LISTENER
-// BUT IDK IF THATS DOABLE, DOING IT ALL WITH DOM SOUNDS PROMISING
     </script>
 
 </html>
